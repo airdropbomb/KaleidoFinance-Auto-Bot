@@ -124,12 +124,8 @@ class KaleidoMiningBot {
             const newEarnings = this.calculateEarnings();
             const payload = {
                 wallet: this.wallet,
-                session: this.miningState.startTime, // Added session field
-                earnings: {
-                    total: this.currentEarnings.total + newEarnings,
-                    pending: finalUpdate ? 0 : newEarnings,
-                    paid: finalUpdate ? this.currentEarnings.paid + newEarnings : this.currentEarnings.paid
-                }
+                session: this.miningState.startTime,
+                earnings: newEarnings // Changed to just a number
             };
 
             console.log(chalk.blue('[Wallet ' + this.botIndex + '] Sending payload:'), JSON.stringify(payload, null, 2));
