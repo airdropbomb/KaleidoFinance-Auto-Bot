@@ -120,7 +120,7 @@ class KaleidoMiningBot {
             const uptime = Math.floor((Date.now() - this.miningState.startTime) / 1000); // Uptime in seconds
             const payload = {
                 wallet: this.wallet,
-                earnings: newEarnings,
+                earnings: { total: 0, pending: 0, paid: 0 };
                 selectedWorker: this.miningState.worker,
                 selectedPool: this.miningState.pool,
                 uptime: uptime // Replaced session with uptime
