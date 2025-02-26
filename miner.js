@@ -108,7 +108,7 @@ class KaleidoMiningBot {
                 return await requestFn();
             } catch (error) {
                 if (i === retries - 1) throw error;
-                console.log(chalk.yellow(`[${operationName}] Retrying (${i + 1}/${retries})...`));
+                // Retry message ကို ဖျောက်ထားတယ်
                 await new Promise(resolve => setTimeout(resolve, 2000 * (i + 1)));
             }
         }
@@ -167,7 +167,7 @@ class KaleidoMiningBot {
     async startMiningLoop() {
         while (this.miningState.isActive) {
             await this.updateBalance();
-            await new Promise(resolve => setTimeout(resolve, 60000)); // Changed to 1 minute (60 seconds)
+            await new Promise(resolve => setTimeout(resolve, 60000)); // 1 minute timer
         }
     }
 
