@@ -61,7 +61,7 @@ class KaleidoMiningBot {
         try {
             await fs.writeFile(this.sessionFile, JSON.stringify(sessionData, null, 2));
         } catch (error) {
-            console.error(chalk.red(`[Wallet ${this.botIndex}] Failed to save session:`, error.message));
+            console.error(chalk.red(`[Wallet ${this.botIndex}] Failed to save session:`), error.message);
         }
     }
 
@@ -131,6 +131,7 @@ class KaleidoMiningBot {
                 }
             };
 
+            console.log(chalk.blue('[Wallet ' + this.botIndex + '] Sending payload:'), JSON.stringify(payload, null, 2));
             const response = await this.retryRequest(
                 () => this.api.post('/update-balance', payload),
                 "Balance update"
@@ -148,6 +149,9 @@ class KaleidoMiningBot {
             }
         } catch (error) {
             console.error(chalk.red(`[Wallet ${this.botIndex}] Update failed:`), error.message);
+            if (error.response) {
+                console.log(chalk.red('[Wallet ' + this.botIndex + '] Server response:'), error.response.data);
+            }
         }
     }
 
