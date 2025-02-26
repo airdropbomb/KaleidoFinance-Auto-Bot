@@ -117,12 +117,13 @@ class KaleidoMiningBot {
     async updateBalance(finalUpdate = false) {
         try {
             const newEarnings = this.calculateEarnings();
+            const uptime = Math.floor((Date.now() - this.miningState.startTime) / 1000); // Uptime in seconds
             const payload = {
                 wallet: this.wallet,
                 earnings: newEarnings,
                 selectedWorker: this.miningState.worker,
                 selectedPool: this.miningState.pool,
-                session: this.miningState.startTime // Added session as a number (timestamp)
+                uptime: uptime // Replaced session with uptime
             };
 
             console.log(chalk.blue('[Wallet ' + this.botIndex + '] Sending payload:'), JSON.stringify(payload, null, 2));
