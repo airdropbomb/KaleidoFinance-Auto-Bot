@@ -119,7 +119,7 @@ class KaleidoMiningBot {
             const newEarnings = this.calculateEarnings();
             const payload = {
                 wallet: this.wallet,
-                amount: newEarnings, // Changed "earnings" to "amount" to test if server expects this
+                earnings: newEarnings,
                 selectedWorker: this.miningState.worker,
                 selectedPool: this.miningState.pool
             };
@@ -143,24 +143,26 @@ class KaleidoMiningBot {
         } catch (error) {
             console.error(chalk.red(`[Wallet ${this.botIndex}] Update failed:`), error.message);
             if (error.response) {
-                console.log(chalk.red('Server response:'), error.response.data); // Log server response for debugging
+                console.log(chalk.red('Server response:'), error.response.data);
             }
         }
     }
 
     logStatus(final = false) {
         const statusType = final ? "Final Status" : "Mining Status";
-        const uptime = ((Date.now() - this.miningState.startTime) / 1000).toFixed(0);
+        const uptime = Math.floor((Date.now() - this.miningState.startTime) / 1000); // Uptime in seconds, matching website
+        const lastUpdated = new Date().toISOString(); // Current time in ISO format like website
         
         console.log(chalk.yellow(`
         === [Wallet ${this.botIndex}] ${statusType} ===
-        Wallet: ${this.wallet}
-        Uptime: ${uptime}s | Active: ${this.miningState.isActive}
-        Hashrate: ${this.stats.hashrate} MH/s
-        Total: ${chalk.cyan(this.currentEarnings.total.toFixed(8))} KLDO
-        Pending: ${chalk.yellow(this.currentEarnings.pending.toFixed(8))} KLDO
-        Paid: ${chalk.green(this.currentEarnings.paid.toFixed(8))} KLDO
-        Referral Bonus: ${chalk.magenta(`+${(this.referralBonus * 100).toFixed(1)}%`)}
+        Earnings:
+          Total: ${chalk.cyan(this.currentEarnings.total.toFixed(10))} KLDO
+          Pending: ${chalk.yellow(this.currentEarnings.pending.toFixed(10))} KLDO
+          Paid: ${chalk.green(this.currentEarnings.paid.toFixed(10))} KLDO
+        Last Updated: ${lastUpdated}
+        Selected Pool: ${this.miningState.pool}
+        Selected Worker: ${this.miningState.worker}
+        Uptime: ${uptime}
         `));
     }
 
