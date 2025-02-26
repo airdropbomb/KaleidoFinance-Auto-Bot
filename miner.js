@@ -120,8 +120,8 @@ class KaleidoMiningBot {
             const payload = {
                 wallet: this.wallet,
                 earnings: newEarnings,
-                selectedWorker: this.miningState.worker, // Added from website payload
-                selectedPool: this.miningState.pool     // Added from website payload
+                selectedWorker: this.miningState.worker,
+                selectedPool: this.miningState.pool
             };
 
             console.log(chalk.blue('[Wallet ' + this.botIndex + '] Sending payload:'), JSON.stringify(payload, null, 2));
@@ -131,17 +131,18 @@ class KaleidoMiningBot {
             );
 
             if (response.data.success) {
+                // Assuming server returns {total, pending, paid} structure
                 this.currentEarnings = {
-                    total: response.data.balance,
-                    pending: finalUpdate ? 0 : newEarnings,
-                    paid: finalUpdate ? this.currentEarnings.paid + newEarnings : this.currentEarnings.paid
+                    total: response.data.total || response.data.balance, // Fallback to balance if total not provided
+                    pending: response.data.pending || (finalUpdate ? 0 : newEarnings),
+                    paid: response.data.paid || (finalUpdate ? this.currentEarnings.paid + newEarnings : this.currentEarnings.paid)
                 };
                 
                 await this.saveSession();
                 this.logStatus(finalUpdate);
             }
         } catch (error) {
-            // Error messages hidden as per your previous request
+            // Error messages hidden as per your request
         }
     }
 
