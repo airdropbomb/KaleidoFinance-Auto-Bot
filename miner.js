@@ -142,7 +142,7 @@ class KaleidoMiningBot {
                 this.logStatus(finalUpdate);
             }
         } catch (error) {
-            // Error messages hidden as per your request
+            console.error(chalk.red(`[Wallet ${this.botIndex}] Update failed:`), error.message);
         }
     }
 
