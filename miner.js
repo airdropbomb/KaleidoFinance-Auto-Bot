@@ -119,7 +119,7 @@ class KaleidoMiningBot {
             const newEarnings = this.calculateEarnings();
             const payload = {
                 wallet: this.wallet,
-                earnings: newEarnings,
+                amount: newEarnings, // Changed "earnings" to "amount" to test if server expects this
                 selectedWorker: this.miningState.worker,
                 selectedPool: this.miningState.pool
             };
@@ -131,9 +131,8 @@ class KaleidoMiningBot {
             );
 
             if (response.data.success) {
-                // Assuming server returns {total, pending, paid} structure
                 this.currentEarnings = {
-                    total: response.data.total || response.data.balance, // Fallback to balance if total not provided
+                    total: response.data.total || response.data.balance,
                     pending: response.data.pending || (finalUpdate ? 0 : newEarnings),
                     paid: response.data.paid || (finalUpdate ? this.currentEarnings.paid + newEarnings : this.currentEarnings.paid)
                 };
@@ -143,6 +142,9 @@ class KaleidoMiningBot {
             }
         } catch (error) {
             console.error(chalk.red(`[Wallet ${this.botIndex}] Update failed:`), error.message);
+            if (error.response) {
+                console.log(chalk.red('Server response:'), error.response.data); // Log server response for debugging
+            }
         }
     }
 
