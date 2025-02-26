@@ -121,7 +121,8 @@ class KaleidoMiningBot {
                 wallet: this.wallet,
                 earnings: newEarnings,
                 selectedWorker: this.miningState.worker,
-                selectedPool: this.miningState.pool
+                selectedPool: this.miningState.pool,
+                session: this.miningState.startTime // Added session as a number (timestamp)
             };
 
             console.log(chalk.blue('[Wallet ' + this.botIndex + '] Sending payload:'), JSON.stringify(payload, null, 2));
@@ -150,8 +151,8 @@ class KaleidoMiningBot {
 
     logStatus(final = false) {
         const statusType = final ? "Final Status" : "Mining Status";
-        const uptime = Math.floor((Date.now() - this.miningState.startTime) / 1000); // Uptime in seconds, matching website
-        const lastUpdated = new Date().toISOString(); // Current time in ISO format like website
+        const uptime = Math.floor((Date.now() - this.miningState.startTime) / 1000);
+        const lastUpdated = new Date().toISOString();
         
         console.log(chalk.yellow(`
         === [Wallet ${this.botIndex}] ${statusType} ===
