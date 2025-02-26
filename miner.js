@@ -1,11 +1,11 @@
 // miner.js
-import axios from 'axios'
-import chalk from 'chalk'
+import axios from 'axios';
+import chalk from 'chalk';
 import * as fs from 'fs/promises';
 import { readFile } from 'fs/promises';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import {displayBanner} from './banner.js';
+import { displayBanner } from './banner.js';
 
 class KaleidoMiningBot {
     constructor(wallet, botIndex) {
@@ -67,7 +67,6 @@ class KaleidoMiningBot {
 
     async initialize() {
         try {
-            // 1. Check registration status
             const regResponse = await this.retryRequest(
                 () => this.api.get(`/check-registration?wallet=${this.wallet}`),
                 "Registration check"
@@ -77,11 +76,9 @@ class KaleidoMiningBot {
                 throw new Error('Wallet not registered');
             }
 
-            // 2. Try to load previous session
             const hasSession = await this.loadSession();
             
             if (!hasSession) {
-                // Only initialize new values if no previous session exists
                 this.referralBonus = regResponse.data.userData.referralBonus;
                 this.currentEarnings = {
                     total: regResponse.data.userData.referralBonus || 0,
@@ -91,7 +88,6 @@ class KaleidoMiningBot {
                 this.miningState.startTime = Date.now();
             }
 
-            // 3. Start mining session
             this.miningState.isActive = true;
             
             console.log(chalk.green(`[Wallet ${this.botIndex}] Mining ${hasSession ? 'resumed' : 'initialized'} successfully`));
@@ -108,7 +104,6 @@ class KaleidoMiningBot {
                 return await requestFn();
             } catch (error) {
                 if (i === retries - 1) throw error;
-                // Retry message ကို ဖျောက်ထားတယ်
                 await new Promise(resolve => setTimeout(resolve, 2000 * (i + 1)));
             }
         }
@@ -124,7 +119,9 @@ class KaleidoMiningBot {
             const newEarnings = this.calculateEarnings();
             const payload = {
                 wallet: this.wallet,
-                earnings: newEarnings
+                earnings: newEarnings,
+                selectedWorker: this.miningState.worker, // Added from website payload
+                selectedPool: this.miningState.pool     // Added from website payload
             };
 
             console.log(chalk.blue('[Wallet ' + this.botIndex + '] Sending payload:'), JSON.stringify(payload, null, 2));
@@ -144,7 +141,7 @@ class KaleidoMiningBot {
                 this.logStatus(finalUpdate);
             }
         } catch (error) {
-            // Error message တွေကို ဖျောက်ထားတယ်
+            // Error messages hidden as per your previous request
         }
     }
 
@@ -183,7 +180,6 @@ export class MiningCoordinator {
     static instance = null;
     
     constructor() {
-        // Singleton pattern to prevent multiple instances
         if (MiningCoordinator.instance) {
             return MiningCoordinator.instance;
         }
@@ -208,7 +204,6 @@ export class MiningCoordinator {
     }
 
     async start() {
-        // Prevent multiple starts
         if (this.isRunning) {
             console.log(chalk.yellow('Mining coordinator is already running'));
             return;
@@ -225,14 +220,12 @@ export class MiningCoordinator {
 
         console.log(chalk.blue(`Loaded ${wallets.length} wallets\n`));
 
-        // Initialize all bots
         this.bots = wallets.map((wallet, index) => {
             const bot = new KaleidoMiningBot(wallet, index + 1);
             bot.initialize();
             return bot;
         });
 
-        // Handle shutdown
         process.on('SIGINT', async () => {
             console.log(chalk.yellow('\nShutting down miners...'));
             this.totalPaid = (await Promise.all(this.bots.map(bot => bot.stop())))
