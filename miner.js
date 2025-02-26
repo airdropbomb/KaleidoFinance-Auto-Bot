@@ -144,10 +144,7 @@ class KaleidoMiningBot {
                 this.logStatus(finalUpdate);
             }
         } catch (error) {
-            console.error(chalk.red(`[Wallet ${this.botIndex}] Update failed:`), error.message);
-            if (error.response) {
-                console.log(chalk.red('[Wallet ' + this.botIndex + '] Server response:'), error.response.data);
-            }
+            // Error message တွေကို ဖျောက်ထားတယ်
         }
     }
 
@@ -170,7 +167,7 @@ class KaleidoMiningBot {
     async startMiningLoop() {
         while (this.miningState.isActive) {
             await this.updateBalance();
-            await new Promise(resolve => setTimeout(resolve, 30000)); // Update every 30 seconds
+            await new Promise(resolve => setTimeout(resolve, 60000)); // Changed to 1 minute (60 seconds)
         }
     }
 
